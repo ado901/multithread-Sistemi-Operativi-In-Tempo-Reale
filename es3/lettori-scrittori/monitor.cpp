@@ -3,20 +3,22 @@
 RWMonitor::RWMonitor() : num_readers(0), num_writers(0), readers_in_queue(0), writers_in_queue(0)
 {
 }
-//STRONG WRITER POSSIBILE STARVATION PER READER
+
 void RWMonitor::rlock()
 {
 	std::unique_lock<std::mutex> lock(mutex);
-	//writer preference
+	
 	readers_in_queue++;
+	//writer preference
 	if (preference==Preference::WRITER){
-	if (num_writers > 0 || writers_in_queue > 0)
-	{
-		if (type==Type::STRONG){read_queue.wait(lock);} 
-		else queue.wait(lock);
-		
+		if (num_writers > 0 || writers_in_queue > 0)
+		{
+			if (type==Type::STRONG){read_queue.wait(lock);} 
+			else queue.wait(lock);
+			
+		}
 	}
-	}
+	//reader preference
 	else if (num_writers > 0){
 			if (type==Type::STRONG){read_queue.wait(lock);} 
 			else queue.wait(lock);
